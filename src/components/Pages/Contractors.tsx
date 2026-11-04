@@ -30,6 +30,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+ import { API_BASE_URL } from '../../config';
 
 const getStrategyText = (value: number | string): string => {
     if (value === 0 || value === 'Annual') return 'Раз в год';
@@ -61,6 +62,7 @@ const Contractors = () => {
         basePricePerKm: 0,
         rating: 0
     });
+   
 
     const getToken = () => localStorage.getItem('token');
 
@@ -73,7 +75,7 @@ const Contractors = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:5157/api/contractors', {
+                const response = await fetch(`${API_BASE_URL}/contractors`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -148,7 +150,7 @@ const Contractors = () => {
         console.log("📦 PUT Payload:", payload);
 
         try {
-            const response = await fetch(`http://localhost:5157/api/contractors/${editingContr.id}`, {
+            const response = await fetch(`${API_BASE_URL}/contractors/${editingContr.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -188,7 +190,7 @@ const Contractors = () => {
         if (!token) return;
 
         try {
-            const response = await fetch(`http://localhost:5157/api/contractors/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/contractors/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -235,7 +237,7 @@ const Contractors = () => {
         console.log("📦 POST Payload:", payload);
 
         try {
-            const response = await fetch('http://localhost:5157/api/contractors', {
+            const response = await fetch(`${API_BASE_URL}/contractors`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

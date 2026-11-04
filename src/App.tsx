@@ -4,6 +4,8 @@ import Login from './components/Login/Login';
 import Home from './components/Pages/Pipe';
 import Layout from './components/Layout/Layout';
 import Contractors from './components/Pages/Contractors';
+import MaintenanceRecords from './components/Pages/MaintenanceRecord';
+
 
 function App() {
     return (
@@ -13,6 +15,8 @@ function App() {
                 <Route element={<Layout />}>
                     <Route path="/pipelines" element={<Home />} />
                     <Route path="/contractors" element={<Contractors />} />
+                    <Route path="/maintenancerecords" element={<MaintenanceRecords />} />
+                    
                 </Route>
             </Routes>
         </BrowserRouter>

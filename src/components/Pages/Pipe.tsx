@@ -26,6 +26,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Stack from '@mui/material/Stack';
 import AddIcon from '@mui/icons-material/Add';
+import { API_BASE_URL } from '../../config';
 
 const Home = () => {
     const [pipelines, setPipelines] = useState<Pipeline[]>([]);
@@ -71,11 +72,11 @@ const Home = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:5157/api/pipelines', {
+                const response = await fetch(`${API_BASE_URL}/pipelines`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
@@ -121,11 +122,11 @@ const Home = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:5157/api/pipelines/${pipeToUpdate.id}`, {
+            const response = await fetch(`${API_BASE_URL}/pipelines/${pipeToUpdate.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(pipeToUpdate)
             });
@@ -154,10 +155,10 @@ const Home = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5157/api/pipelines/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/pipelines/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -195,11 +196,11 @@ const Home = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:5157/api/pipelines', {
+            const response = await fetch(`${API_BASE_URL}/pipelines`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(pipeToAdd)
             });
