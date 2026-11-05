@@ -53,7 +53,8 @@ const MaintenanceRecords = () => {
     });
 
     const token = localStorage.getItem('token');
-
+    const [sortField, setSortField] = useState<string>('id');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); 
     
     useEffect(() => {
         if (!token) {
@@ -99,6 +100,27 @@ const MaintenanceRecords = () => {
             (mr.notes?.toLowerCase() || '').includes(query)
         );
     });
+
+    const sortedReports = [...filteredRecords].sort((a, b) => {
+        let valueA: any = a[sortField as keyof MaintenanceRecord];
+        let valueB: any = b[sortField as keyof MaintenanceRecord];
+    
+    
+        if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+        const handleSort = (field: string) => {
+        if (sortField === field) {
+            
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+           
+            setSortField(field);
+            setSortDirection('asc');
+        }
+        };
 
     
     const handleNewRecordChange = (field: keyof CreateMaintenanceRecord, value: any) => {
@@ -222,9 +244,7 @@ const MaintenanceRecords = () => {
                 <Typography variant='h4' component="h2" sx={{ fontWeight: 'bold', color: 'black' }}>
                     Список отчетов о ТО
                 </Typography>
-                <Button onClick={handleLogout} variant="outlined" color='error' startIcon={<DeleteIcon />}>
-                    Выйти
-                </Button>
+                
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -248,17 +268,17 @@ const MaintenanceRecords = () => {
                     <Table sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Id</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Труба</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Исполнитель</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Дата</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Цена</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}onClick={() => handleSort('id')}>Id {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}onClick={() => handleSort('name')}>Труба {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}onClick={() => handleSort('companyName')}>Исполнитель{sortField === 'companyName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}onClick={() => handleSort('date')}>Дата{sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }} align="right" onClick={() => handleSort('actualCost')}>Цена{sortField === 'actualCost' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Заметки</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }} align="center">Действия</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredRecords.map((mr) => (
+                            {sortedReports.map((mr) => (
                                 <TableRow key={mr.id} hover>
                                     <TableCell>{mr.id}</TableCell>
                                     <TableCell>{mr.pipeline?.name || `ID: ${mr.pipelineId}`}</TableCell>
@@ -279,7 +299,7 @@ const MaintenanceRecords = () => {
 
             {viewMode === 'cards' && (
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3, mt: 2 }}>
-                    {filteredRecords.map((mr) => (
+                    {sortedReports.map((mr) => (
                         <Card key={mr.id} sx={{ boxShadow: 3 }}>
                             <CardContent>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Запись #{mr.id}</Typography>
@@ -373,7 +393,7 @@ const MaintenanceRecords = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Диалог редактирования */}
+            
             <Dialog open={!!editingRecord} onClose={() => setEditingRecord(null)} maxWidth="sm" fullWidth>
                 <DialogTitle>Редактировать запись о ТО</DialogTitle>
                 <DialogContent>

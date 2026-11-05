@@ -30,7 +30,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
- import { API_BASE_URL } from '../../config';
+import { API_BASE_URL } from '../../config';
 
 const getStrategyText = (value: number | string): string => {
     if (value === 0 || value === 'Annual') return 'Раз в год';
@@ -39,7 +39,7 @@ const getStrategyText = (value: number | string): string => {
     return String(value);
 };
 
-// Преобразование числа в строку стратегии
+
 const numberToStrategy = (num: number): string => {
     if (num === 0) return 'Annual';
     if (num === 1) return 'Biennial';
@@ -62,9 +62,12 @@ const Contractors = () => {
         basePricePerKm: 0,
         rating: 0
     });
+    const [sortField, setSortField] = useState<string>('id');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
    
 
     const getToken = () => localStorage.getItem('token');
+
 
     useEffect(() => {
         const fetchContractors = async () => {
@@ -103,10 +106,7 @@ const Contractors = () => {
         fetchContractors();
     }, [navigate]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
-    };
+    
 
     const filteredContractors = contractors.filter(contr => {
         const query = searchQuery.toLowerCase();
@@ -118,6 +118,27 @@ const Contractors = () => {
             (contr.rating?.toString() || '').includes(query)
         );
     });
+
+        const sortedContractors = [...filteredContractors].sort((a, b) => {
+        let valueA: any = a[sortField as keyof Contractor];
+        let valueB: any = b[sortField as keyof Contractor];
+    
+    
+        if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+        const handleSort = (field: string) => {
+        if (sortField === field) {
+            
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+           
+            setSortField(field);
+            setSortDirection('asc');
+        }
+        };
 
     const handleEdit = (contr: Contractor) => {
         setEditingContr(contr);
@@ -220,7 +241,7 @@ const Contractors = () => {
             return;
         }
 
-        // Преобразуем строку стратегии в число
+        
         let strategyNumber = 0;
         if (newContr.strategy === 'Annual') strategyNumber = 0;
         else if (newContr.strategy === 'Biennial') strategyNumber = 1;
@@ -287,9 +308,7 @@ const Contractors = () => {
                 <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', color: 'black' }}>
                     Список исполнителей
                 </Typography>
-                <Button onClick={handleLogout} variant="outlined" color="error" startIcon={<DeleteIcon />}>
-                    Выйти
-                </Button>
+                
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -328,16 +347,16 @@ const Contractors = () => {
                     <Table sx={{ minWidth: 650 }} aria-label="contractors table">
                         <TableHead>
                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Id</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Название компании</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Стратегия ТО</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Цена за км</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Рейтинг</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold'}} onClick={() => handleSort('id')}>Id {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}  onClick={() => handleSort('companyName')}>Название компании{sortField === 'companyName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }} onClick={() => handleSort('strategy')}>Стратегия ТО{sortField === 'strategy' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }} align="right" onClick={() => handleSort('basePricePerKm')}>Цена за км {sortField === 'basePricePerKm' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }} align="right" onClick={() => handleSort('rating')}>Рейтинг {sortField === 'rating' && (sortDirection === 'asc' ? '↑' : '↓')}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }} align="center">Действия</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredContractors.map((contr) => (
+                            {sortedContractors.map((contr) => (
                                 <TableRow
                                     key={contr.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -365,7 +384,7 @@ const Contractors = () => {
 
             {viewMode === 'cards' && (
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3, mt: 2 }}>
-                    {filteredContractors.map((contr) => (
+                    {sortedContractors.map((contr) => (
                         <Card key={contr.id} sx={{ minWidth: 275, boxShadow: 3 }}>
                             <CardContent>
                                 <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>

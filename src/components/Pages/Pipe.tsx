@@ -28,6 +28,7 @@ import Stack from '@mui/material/Stack';
 import AddIcon from '@mui/icons-material/Add';
 import { API_BASE_URL } from '../../config';
 
+
 const Home = () => {
     const [pipelines, setPipelines] = useState<Pipeline[]>([]);
     const [error, setError] = useState('');
@@ -45,6 +46,8 @@ const Home = () => {
         installDate: '',
         lastMaintenanceDate: ''
     });
+    const [sortField, setSortField] = useState<string>('id');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');  
 
     const filteredPipelines = pipelines.filter(pipe => {
         const query = searchQuery.toLowerCase();
@@ -57,6 +60,32 @@ const Home = () => {
             pipe.lastMaintenanceDate.toLowerCase().includes(query)
         );
     });
+
+    const sortedPipelines = [...filteredPipelines].sort((a, b) => {
+    let valueA: any = a[sortField as keyof Pipeline];
+    let valueB: any = b[sortField as keyof Pipeline];
+
+    
+    if (sortField === 'installDate' || sortField === 'lastMaintenanceDate') {
+        valueA = valueA ? new Date(valueA).getTime() : 0;
+        valueB = valueB ? new Date(valueB).getTime() : 0;
+    }
+
+    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+});
+
+    const handleSort = (field: string) => {
+    if (sortField === field) {
+        
+        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+       
+        setSortField(field);
+        setSortDirection('asc');
+    }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -234,7 +263,10 @@ const Home = () => {
     };
 
     return (
-              
+        <>
+        
+       
+
         <Box sx={{ p: 3, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
             
             <style>{`
@@ -246,19 +278,14 @@ const Home = () => {
                 color: #000;
             }
          `}</style>
+
+            
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', color: 'black' }}>
                     Список труб
                 </Typography>
-                <Button
-                    onClick={handleLogout}
-                    variant="outlined"
-                    color="error"
-                    startIcon={<DeleteIcon />}
-                >
-                    Выйти
-                </Button>
+                
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -307,18 +334,32 @@ const Home = () => {
                     <Table sx={{ minWidth: 650 }} aria-label="pipelines table">
                         <TableHead>
                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Id</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Название</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Диаметр</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Длина</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Материал</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Дата установки</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Дата последнего ТО</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('id')}>
+                                    Id {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('name')}>
+                                    Название {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} align="right" onClick={() => handleSort('diameter')}>
+                                    Диаметр {sortField === 'diameter' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} align="right" onClick={() => handleSort('length')}>
+                                    Длина {sortField === 'length' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('material')}>
+                                    Материал {sortField === 'material' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('installDate')}>
+                                    Дата установки {sortField === 'installDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('lastMaintenanceDate')}>
+                                    Дата последнего ТО {sortField === 'lastMaintenanceDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }} align="center">Действия</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredPipelines.map((pipe) => (
+                            {sortedPipelines.map((pipe) => (
                                 <TableRow
                                     key={pipe.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -348,7 +389,7 @@ const Home = () => {
 
             {viewMode === 'cards' && (
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3, mt: 2 }}>
-                    {filteredPipelines.map((pipe) => (
+                    {sortedPipelines.map((pipe) => (
                         <Card key={pipe.id} sx={{ minWidth: 275, boxShadow: 3 }}>
                             <CardContent>
                                 <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
@@ -528,6 +569,7 @@ const Home = () => {
                 </DialogActions>
             </Dialog>
         </Box>
+        </>
     
     );
 };

@@ -22,7 +22,7 @@ const Login = () => {
         setError('');
         setIsLoading(true);
         
-        // Хешируем пароль, как требует бэкенд
+      
         const hashedPassword = CryptoJS.MD5(pass).toString();
 
         try {
@@ -31,7 +31,7 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                // ВАЖНО: C# класс LoginRequest ожидает большие буквы (Login, Password)
+                
                 body: JSON.stringify({
                     Login: login,
                     Password: hashedPassword 
@@ -41,13 +41,12 @@ const Login = () => {
             if (response.ok) {
                 const responseData = await response.json();
                 
-                // Бэкенд может вернуть просто строку токена или объект { token: "..." }
-                // Эта проверка спасет от ошибки undefined
+               
                 const token = typeof responseData === 'string' ? responseData : responseData.token;
                 
                 localStorage.setItem('token', token);
 
-                alert('Успешный вход!');
+                
                 navigate('/pipelines');
 
             } else {
