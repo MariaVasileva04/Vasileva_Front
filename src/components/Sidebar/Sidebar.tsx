@@ -18,6 +18,7 @@ const Sidebar = () =>{
                 <Link style={{display: 'block', padding:'10px', color:'white', textDecoration:'none'}} to="/pipelines">Трубы</Link>
                 <Link style={{display: 'block', padding:'10px', color:'white', textDecoration:'none'}} to="/contractors">Исполнители</Link>
                 <Link style={{display: 'block', padding:'10px', color:'white', textDecoration:'none'}} to="/maintenancerecords">Записи о ТО</Link>
+                <Link style={{display: 'block', padding:'10px', color:'white', textDecoration:'none'}} to="/reports">Отчеты</Link>
                 
             </nav>
         </div>

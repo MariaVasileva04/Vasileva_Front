@@ -5,6 +5,7 @@ import Home from './components/Pages/Pipe';
 import Layout from './components/Layout/Layout';
 import Contractors from './components/Pages/Contractors';
 import MaintenanceRecords from './components/Pages/MaintenanceRecord';
+import Reports from './components/Pages/Reports';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/pipelines" element={<Home />} />
                     <Route path="/contractors" element={<Contractors />} />
                     <Route path="/maintenancerecords" element={<MaintenanceRecords />} />
+                    <Route path="/reports" element={<Reports />} />
                     
                 </Route>
             </Routes>
